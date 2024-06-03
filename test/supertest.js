@@ -216,6 +216,23 @@ describe('request(app)', function () {
       });
   });
 
+  describe('.bearer(token)', function () {
+    it('should work the bearer token', function () {
+      const app = express();
+      const test = request(app);
+
+      app.get('/', function (req, res) {
+        if (req.headers.authorization === 'Bearer test-token') {
+          res.status(200).send('Authorized');
+        } else {
+          res.status(403).send('Unauthorized');
+        }
+      });
+
+      test.get('/').bearer('test-token').expect(200).expect('Authoried');
+    });
+  });
+
   describe('.end(fn)', function () {
     it('should close server', function (done) {
       const app = express();
@@ -818,7 +835,7 @@ describe('request(app)', function () {
 
       it("doesn't create false negatives on non error objects", function (done) {
         const handler = {
-          get: function(target, prop, receiver) {
+          get: function (target, prop, receiver) {
             throw Error('Should not be called for non Error objects');
           }
         };
@@ -1367,7 +1384,7 @@ describe('request.get(url).query(vals) works as expected', function () {
 });
 
 const describeHttp2 = (http2) ? describe : describe.skip;
-describeHttp2('http2', function() {
+describeHttp2('http2', function () {
   // eslint-disable-next-line global-require
   const proxyquire = require('proxyquire');
 
@@ -1386,7 +1403,7 @@ describeHttp2('http2', function() {
 
   tests.forEach(({ title, api, mockApi }) => {
     describe(title, function () {
-      const app = function(req, res) {
+      const app = function (req, res) {
         res.end('hey');
       };
 
@@ -1416,8 +1433,8 @@ describeHttp2('http2', function() {
         });
       });
 
-      it('should throw error if http2 is not supported', function() {
-        (function() {
+      it('should throw error if http2 is not supported', function () {
+        (function () {
           mockApi(app, { http2: true });
         }).should.throw('supertest: this version of Node.js does not support http2');
       });
